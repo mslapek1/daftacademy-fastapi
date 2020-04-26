@@ -66,7 +66,7 @@ def hello_world():
 # Wykład 3 - zadanie 2
 
 from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import RedirectResponse
 import secrets
