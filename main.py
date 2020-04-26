@@ -55,3 +55,10 @@ def get_person(pk: int):
 	else:
 		raise HTTPException(status_code=204, detail="Patient doesn't exists")
 
+
+# Wykład 3 - zadanie 1
+
+@app.get('/')
+@app.get('/welcome')
+def hello_world():
+	return {"message": "Hello World during the coronavirus pandemic!"}
