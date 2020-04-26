@@ -83,11 +83,12 @@ def user(cred: HTTPBasicCredentials = Depends(security)):
 		app.session[token] = cred.username
 
 		return token
-	else: 
+	else:
+		response.status_code = status.HTTP_401_UNAUTHORIZED
 		print("Incorrect email or password!")
 
 @app.post("/login/")
-def create_cookie(response: Response, session_token = Depends(user)):
-
+def create_cookie(response: Response, session_token: str = Depends(user)):
+    response.status_code = status.HTTP_302_FOUND
     response.headers['Location'] = "/welcome/"
     response.set_cookie(key="session_token", value=session_token)
