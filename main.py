@@ -78,13 +78,3 @@ def create_cookie(cred: HTTPBasicCredentials = Depends(HTTPBasic())):
     correct_username  = secrets.compare_digest(cred.username, 'trudnY')
 	correct_password = secrets.compare_digest(cred.password, 'PaC13Nt')
 
-	if not (correct_username and correct_password):
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong data')
-
-
-	session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()	
-
-    response: RedirectResponse = RedirectResponse("/welcome", 302)
-    response.set_cookie(key='session_token', value=session_token)
-
-    return response
