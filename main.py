@@ -59,6 +59,18 @@ def get_person(pk: int):
 # Wykład 3 - zadanie 1
 
 @app.get('/')
-@app.get('/welcome')
+@app.get('/welcome/')
 def hello_world():
 	return {"message": "Hello World during the coronavirus pandemic!"}
+
+# Wykład 3 - zadanie 2
+
+from hashlib import sha256
+from fastapi import FastAPI, Response, Cookie, HTTPException
+
+
+@app.post('/login/')
+def create_cookie(user: str, password: str, response: Response):
+	session_token = sha256(bytes(f"{user}{password}{app.secret_key}")).hexdigest()
+	response.set_cookie(key="session_token", value=session_token)
+	return {"message": "Welcome"}
