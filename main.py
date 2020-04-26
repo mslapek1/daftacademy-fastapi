@@ -71,17 +71,21 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import secrets
 
 app.secret_key = "Trzeba utworzyc sesje nalezy posluzyc sie mechanizmem cookies"
+security = HTTPBasic()
 
 @app.post('/login/')
-def create_cookie(response: Response, session_token: str = Depends(user)):
+def create_cookie(cred: HTTPBasicCredentials = Depends(security)):
     username = secrets.compare_digest(cred.username, 'trudnY')
 	password = secrets.compare_digest(cred.password, 'PaC13Nt')
 
-	if username and password:
-		token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()
-		app.session[token] = cred.username
-	else:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Wrong data',headers={'WWW-Authenticate': 'Basic'})
+	if not (username and password):
+
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong data', headers={'WWW-Authenticate': 'Basic'})
+
+
+	token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()
+	app.session[token] = cred.username
+	
 
     response=RedirectResponse(url='/welcome', status_code=302)
     response.set_cookie(key='session_token', value=session_token)
