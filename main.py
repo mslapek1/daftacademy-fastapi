@@ -83,9 +83,9 @@ def create_cookie(cred: HTTPBasicCredentials = Depends(security)):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong data', headers={'WWW-Authenticate': 'Basic'})
 
 
-	token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()
-	app.session[token] = cred.username
-	
+	session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()	
 
-    response=RedirectResponse(url='/welcome', status_code=302)
+    response: RedirectResponse = RedirectResponse(url='/welcome', status_code=302)
     response.set_cookie(key='session_token', value=session_token)
+
+    return response
