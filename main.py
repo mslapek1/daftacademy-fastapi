@@ -72,20 +72,22 @@ import secrets
 
 app.secret_key = "Trzeba utworzyć sesję - należy posłużyć się mechanizmem cookies"
 app.sessions = {}
+security = HTTPBasic()
 
-
-@app.post("/login/")
-def create_cookie(response: Response):
-	cred = Depends(HTTPBasic())
+def user(cred: HTTPBasicCredentials = Depends(security)):
 	username = secrets.compare_digest(cred.username, 'trudnY')
 	password = secrets.compare_digest(cred.password, 'PaC13Nt')
 
 	if (username and password):
 		token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()
 		app.session[token] = cred.username
+
+		return token
 	else: 
 		print("Incorrect email or password!")
 
+@app.post("/login/")
+def create_cookie(response: Response, session_token = Depends(user)):
 
     response.headers['Location'] = "/welcome/"
     response.set_cookie(key="session_token", value=session_token)
