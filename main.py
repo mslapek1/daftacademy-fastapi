@@ -66,24 +66,23 @@ def hello_world():
 # Wykład 3 - zadanie 2
 
 from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Depends, status, Response
+from fastapi import FastAPI, HTTPException, Depends, status, Response, Cookie
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import RedirectResponse
 import secrets
 
-app.secret_key = "Trzeba utworzyc sesje nalezy posluzyc sie mechanizmem cookies"
+app.secret_key = "Mariusz"
 
 @app.post('/login/')
 def create_cookie(cred: HTTPBasicCredentials = Depends(HTTPBasic())):
-    username = secrets.compare_digest(cred.username, 'trudnY')
-	password = secrets.compare_digest(cred.password, 'PaC13Nt')
+    correct_username  = secrets.compare_digest(cred.username, 'trudnY')
+	correct_password = secrets.compare_digest(cred.password, 'PaC13Nt')
 
-	if not (username and password):
+	if not (correct_username and correct_password):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong data')
 
 
 	session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()	
-
 
     response: RedirectResponse = RedirectResponse("/welcome", 302)
     response.set_cookie(key='session_token', value=session_token)
