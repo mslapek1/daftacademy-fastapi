@@ -66,11 +66,26 @@ def hello_world():
 # Wykład 3 - zadanie 2
 
 from hashlib import sha256
-from fastapi import FastAPI, Response, Cookie, HTTPException
+from fastapi import FastAPI, Cookie, HTTPException, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import secrets
+
+app.secret_key = "Trzeba utworzyć sesję - należy posłużyć się mechanizmem cookies"
+app.sessions = {}
 
 
-@app.post('/login/')
-def create_cookie(user: str, password: str, response: Response):
-	session_token = sha256(bytes(f"{user}{password}{app.secret_key}")).hexdigest()
-	response.set_cookie(key="session_token", value=session_token)
-	return {"message": "Welcome"}
+@app.post("/login/")
+def create_cookie(response: Response):
+	cred = Depends(HTTPBasic())
+	username = secrets.compare_digest(cred.username, 'trudnY')
+	password = secrets.compare_digest(cred.password, 'PaC13Nt')
+
+	if (username and password):
+		token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()
+		app.session[token] = cred.username
+	else: 
+		print("Incorrect email or password!")
+
+
+    response.headers['Location'] = "/welcome/"
+    response.set_cookie(key="session_token", value=session_token)
