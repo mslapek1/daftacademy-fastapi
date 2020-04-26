@@ -74,19 +74,18 @@ import secrets
 app.secret_key = "Trzeba utworzyc sesje nalezy posluzyc sie mechanizmem cookies"
 
 @app.post('/login/')
-def create_cookie(response: Response, cred: HTTPBasicCredentials = Depends(HTTPBasic())):
-    c_username = secrets.compare_digest(cred.username, 'trudnY')
-	c_password = secrets.compare_digest(cred.password, 'PaC13Nt')
+def create_cookie(cred: HTTPBasicCredentials = Depends(HTTPBasic())):
+    username = secrets.compare_digest(cred.username, 'trudnY')
+	password = secrets.compare_digest(cred.password, 'PaC13Nt')
 
-	if not (c_username and c_password):
+	if not (username and password):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong data', headers={'WWW-Authenticate': 'Basic'})
 
 
 	session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", encoding='utf8')).hexdigest()	
 
-    response.set_cookie(key='session_token', value=session_token)
-    response.headers["Location"] = "/welcome"
-    response.status_code = status.HTTP_301_MOVED_PERMANENTLY
 
+    response: RedirectResponse = RedirectResponse("/welcome", 302)
+    response.set_cookie(key='session_token', value=session_token)
 
     return response
