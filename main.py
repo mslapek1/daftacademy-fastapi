@@ -63,6 +63,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import RedirectResponse
 import secrets
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
+
 templates = Jinja2Templates(directory="html")
 
 app.secret_key = "Mariusz"
@@ -111,4 +113,41 @@ def ex3(response: Response, session_token: str = Cookie(None)):
 	response.delete_cookie(key="session_token", path="/")
 	return response 
 
- 
+ # Wykład 3 - zadanie 5
+
+ app.list = list()
+
+ @app.post('/patient')
+ def add(response: Response, patient: Patient, session_token: str = Cookie(None)):
+ 	if session_token not in app.sessions:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+	app.list.append(patient)
+	response = RedirectResponse(url=f"/patient/{len(app.list)}", status_code=302)
+	response.set_cookie(key="session_token", value=session_token)
+
+	return response
+
+@app.get('/patient')
+def all(patient: Patient, session_token: str = Cookie(None)):
+	if session_token not in app.sessions:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+
+	return app.list
+
+@app.get('/patient/{patient}')
+def get(patient: int, session_token: str = Cookie(None)):
+	if session_token not in app.sessions:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+	if(patient > len(app.list) or patient < 1):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+
+	return app.list[patient]
+
+@app.delete('/patient/{patient}')
+def delate(patient: int, session_token: str = Cookie(None)):
+	if session_token not in app.sessions:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
+	if(patient > len(app.list) or patient < 1):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+
+	app.list.remove(app.list[patient])
