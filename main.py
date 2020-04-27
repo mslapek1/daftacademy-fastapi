@@ -127,3 +127,34 @@ def patient_position(response: Response, pt: Name, session_token: str = Cookie(N
 	response.set_cookie(key="session_token", value=session_token)
 	app.counter += 1
 	return response
+
+@app.get("/patient")
+def all(session_token: str = Cookie(None)):
+	if session_token not in list(app.sessions.keys()):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+	if(app.counter == 0):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+
+	return app.list
+
+@app.get("/patient/{pt}")
+def get(pt: int, session_token: str = Cookie(None)):
+	if session_token not in list(app.sessions.keys()):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+	if(pt > app.counter or pt < 1):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+
+	return app.list[pt]
+
+@app.delete("/patient/{pt}")
+def del_patient(response: Response, pt: int, session_token: str = Cookie(None)):
+	if session_token not in list(app.sessions.keys()):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
+	if(pt > app.counter or pt < 1):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+	app.counter -= 1
+	app.list.pop(pt)
+	response.status_code = 204
+	response.headers["Location"] = "/patient/{pk}"
+
+	return response
