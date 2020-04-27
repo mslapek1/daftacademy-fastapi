@@ -116,23 +116,22 @@ def ex3(response: Response, session_token: str = Cookie(None)):
  # Wykład 3 - zadanie 5
 
 app.list_patients = []
-app.counter = 0
 
 @app.post("/patient")
 def patient_position(response: Response, pt: Name, session_token: str = Cookie(None)):
 	if not session_token in list(app.sessions.keys()): 
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+	id = len(app.list_patients)
 	app.list_patients.append(pt)
-	response = RedirectResponse(url=f"/patient/{app.counter}", status_code=302)
+	response = RedirectResponse(url=f"/patient/{id}", status_code=302)
 	response.set_cookie(key="session_token", value=session_token)
-	app.counter += 1
 	return response
 
 @app.get("/patient")
 def all(session_token: str = Cookie(None)):
 	if session_token not in list(app.sessions.keys()):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(app.counter < 1):
+	if not app.list_patients:
 		raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 	return app.list_patients
 
@@ -150,7 +149,6 @@ def del_patient(response: Response, pk: int, session_token: str = Cookie(None)):
 	if session_token not in list(app.sessions.keys()):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
 	if pk in app.list_patients:
-		app.counter -= 1
 		app.list_patients.pop(pk)
 	
 	response.status_code = status.HTTP_204_NO_CONTENT
