@@ -58,7 +58,7 @@ def get_person(pk: int):
 
 # Wykład 3 - libraries
 from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Depends, status, Response, Cookie
+from fastapi import FastAPI, HTTPException, Depends, status, Response, Cookie, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import RedirectResponse
 import secrets
