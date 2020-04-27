@@ -57,6 +57,8 @@ def get_person(pk: int):
 
 
 # Wykład 3 - zadanie 1 i 4
+from fastapi.templating import Jinja2Templates
+templates = Jinja2Templates(directory="html")
 
 @app.get('/welcome/')
 def hi(request: Request, session_token: str = Cookie(None)):
