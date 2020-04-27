@@ -146,10 +146,16 @@ def get(pt: int, session_token: str = Cookie(None)):
 	return app.list[pt]
 
 @app.delete('/patient/{pt}')
-def del_patient(pt: int, session_token: str = Cookie(None)):
+def del_patient(response: Response, pt: int, session_token: str = Cookie(None)):
 	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
 	if(pt > len(app.list) or pt < 1):
 		return HTTPException(status_code=204, detail="Error - wrong value")
 
-	app.list.remove(app.list[pt])
+	app.list.pop(pt)
+	response.status_code = 307
+	response.headers['Location'] = "/patient"
+	RedirectResponse(url='/patient')
+
+	return response
+
