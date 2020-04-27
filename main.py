@@ -117,15 +117,16 @@ def ex3(response: Response, session_token: str = Cookie(None)):
 
 app.lists = []
 app.counter = 0 
-@app.post("/patient", response_model=Name)
-def patient_add(response: Response, pt: Name, session_token: str = Cookie(None)):
- 	if session_token not in app.sessions:
+app.list_of_patient = []
+
+
+
+@app.post("/patient",response_model=Patient)
+def patient_position(response: Response, pt: Patient,session_token: str = Cookie(None)):
+	if not session_token in app.sesion_keys: 
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-	app.lists.append(pt)
+	app.list_of_patient.append(pt)
 	response = RedirectResponse(url=f"/patient/{app.counter}", status_code=302)
 	response.set_cookie(key="session_token", value=session_token)
-
 	app.counter += 1
-
 	return response
-
