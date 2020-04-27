@@ -56,11 +56,10 @@ def get_person(pk: int):
 		raise HTTPException(status_code=204, detail="Patient doesn't exists")
 
 
-# Wykład 3 - zadanie 1 i 3
+# Wykład 3 - zadanie 1 i 4
 
-@app.get('/')
 @app.get('/welcome/')
-def hello_world(request: Request, session_token: str = Cookie(None)):
+def hi(request: Request, session_token: str = Cookie(None)):
 	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 
