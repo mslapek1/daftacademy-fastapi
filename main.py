@@ -73,10 +73,11 @@ import secrets
 
 app.secret_key = "Mariusz"
 security = HTTPBasic()
+app.sessions = {}
 
 
 @app.post("/login")
-def login(cred: HTTPBasicCredentials = Depends(security)):
+def ex2(cred: HTTPBasicCredentials = Depends(security)):
     username = secrets.compare_digest(cred.username, "trudnY")
     password = secrets.compare_digest(cred.password, "PaC13Nt")
 
@@ -84,6 +85,8 @@ def login(cred: HTTPBasicCredentials = Depends(security)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Wrong data", headers={"WWW-Authenticate": "Basic"},)
 
     session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", "utf8")).hexdigest()
+
+    app.sessions[session_token] = cred.username
     
     response: RedirectResponse = RedirectResponse("/welcome", 302)
     response.set_cookie(key="session_token", value=session_token)
@@ -91,4 +94,15 @@ def login(cred: HTTPBasicCredentials = Depends(security)):
     return response
 
 
+# Wykład 3 - zadanie 3
 
+@app.post("/logout")
+def ex3(response: Response, session_token: str = Cookie(None)):
+	if session_token not in app.sessions:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+		
+	response = RedirectResponse(url="/", status_code=302)
+	response.delete_cookie(key="session_token", path="/")
+	return response 
+
+ 
