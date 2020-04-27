@@ -133,7 +133,7 @@ def all(session_token: str = Cookie(None)):
 	if session_token not in list(app.sessions.keys()):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 	if(app.counter == 0):
-		return HTTPException(status_code=204, detail="Error - wrong value")
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
 	return app.list_patients
 
@@ -142,7 +142,7 @@ def get(pk: int, session_token: str = Cookie(None)):
 	if session_token not in list(app.sessions.keys()):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 	if(pk >= app.counter or pk < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
 	return app.list_patients[pk - 1]
 
@@ -154,3 +154,6 @@ def del_patient(response: Response, pk: int, session_token: str = Cookie(None)):
 		return HTTPException(status_code=204, detail="Error - wrong value")
 	app.counter -= 1
 	app.list_patients.pop(pk)
+    response.status_code = status.HTTP_204_NO_CONTENT
+    response.headers["Location"] = f"/patient/{pk}"
+    return response
