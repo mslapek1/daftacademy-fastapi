@@ -56,12 +56,15 @@ def get_person(pk: int):
 		raise HTTPException(status_code=204, detail="Patient doesn't exists")
 
 
-# Wykład 3 - zadanie 1
+# Wykład 3 - zadanie 1 i 3
 
 @app.get('/')
 @app.get('/welcome/')
-def hello_world():
-	return {"message": "Hello World during the coronavirus pandemic!"}
+def hello_world(request: Request, session_token: str = Cookie(None)):
+	if session_token not in app.sessions:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+
+	return html.TemplateResponse("hi.html", {"request": request, "user": "trudnY"})
 
 # Wykład 3 - zadanie 2
 
@@ -100,9 +103,10 @@ def ex2(cred: HTTPBasicCredentials = Depends(security)):
 def ex3(response: Response, session_token: str = Cookie(None)):
 	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-		
+
 	response = RedirectResponse(url="/", status_code=302)
 	response.delete_cookie(key="session_token", path="/")
 	return response 
 
+# Wykład 3 - zadanie 4
  
