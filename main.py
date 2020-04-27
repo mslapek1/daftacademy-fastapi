@@ -74,21 +74,18 @@ import secrets
 app.secret_key = "Mariusz"
 security = HTTPBasic()
 
-@app.post("/login")
-def login(credentials: HTTPBasicCredentials = Depends(security)):
+@app.post('/login')
+def create_cookie(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "trudnY")
-    correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
+	correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
 
-    if not correct_username or not correct_password:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+	if not (correct_username and correct_password):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Wrong data')
 
-    session_token = sha256(
-        bytes(f"{credentials.username}{credentials.password}{app.secret_key}", "utf8")
-    ).hexdigest()
+
+	session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()	
+
     response: RedirectResponse = RedirectResponse("/welcome", 302)
-    response.set_cookie(key="session_token", value=session_token)
+    response.set_cookie(key='session_token', value=session_token)
+
     return response
