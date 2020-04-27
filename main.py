@@ -56,9 +56,21 @@ def get_person(pk: int):
 		raise HTTPException(status_code=204, detail="Patient doesn't exists")
 
 
-# Wykład 3 - zadanie 1 i 4
+# Wykład 3 - libraries
+from hashlib import sha256
+from fastapi import FastAPI, HTTPException, Depends, status, Response, Cookie
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.responses import RedirectResponse
+import secrets
 from fastapi.templating import Jinja2Templates
 templates = Jinja2Templates(directory="html")
+
+app.secret_key = "Mariusz"
+security = HTTPBasic()
+app.sessions = {}
+
+
+# Wykład 3 - zadanie 1 i 4
 
 @app.get('/welcome/')
 def hi(request: Request, session_token: str = Cookie(None)):
@@ -68,16 +80,6 @@ def hi(request: Request, session_token: str = Cookie(None)):
 	return templates.TemplateResponse("hi.html", {"request": request, "user": "trudnY"})
 
 # Wykład 3 - zadanie 2
-
-from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Depends, status, Response, Cookie
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import RedirectResponse
-import secrets
-
-app.secret_key = "Mariusz"
-security = HTTPBasic()
-app.sessions = {}
 
 
 @app.post("/login")
@@ -109,5 +111,4 @@ def ex3(response: Response, session_token: str = Cookie(None)):
 	response.delete_cookie(key="session_token", path="/")
 	return response 
 
-# Wykład 3 - zadanie 4
  
