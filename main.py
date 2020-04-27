@@ -84,12 +84,12 @@ def login(cred: HTTPBasicCredentials = Depends(security)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Wrong data", headers={"WWW-Authenticate": "Basic"},)
 
     session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", "utf8")).hexdigest()
-
-	response.set_cookie(key="session_token", value=session_token)
     
-    response = RedirectResponse(url='/welcome')
-    response.status_code = status.HTTP_302_FOUND
+	response.status_code = 302
+	RedirectResponse(url='/welcome')   
+	response.set_cookie(key="session_token", value=session_token)
 
     return response
+
 
 
