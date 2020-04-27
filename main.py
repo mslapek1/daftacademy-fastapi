@@ -121,8 +121,8 @@ app.list_of_patient = []
 
 
 
-@app.post("/patient",response_model=Patient)
-def patient_position(response: Response, pt: Patient,session_token: str = Cookie(None)):
+@app.post("/patient",response_model=Name)
+def patient_position(response: Response, pt: Name,session_token: str = Cookie(None)):
 	if not session_token in app.sesion_keys: 
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 	app.list_of_patient.append(pt)
