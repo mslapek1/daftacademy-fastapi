@@ -129,30 +129,28 @@ def patient_position(response: Response, pt: Name, session_token: str = Cookie(N
 	return response
 
 @app.get("/patient")
-def patient_position(session_token: str = Cookie(None)):
-	if not session_token in app.sesion_keys: 
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-	patient_list = {}
-	for i in range(app.counter):
-		patient_list[f"{i}"]=app.list_of_patient[i-1]
-	return patient_list
+def all(session_token: str = Cookie(None)):
+	if session_token not in list(app.sessions.keys()):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+	if(app.counter == 0):
+		return HTTPException(status_code=204, detail="Error - wrong value")
 
+	return app.list_patients
 
-@app.get("/patient/{pk}",response_model=Patient)
-def patient_personal_data(pk: int,session_token: str = Cookie(None)):
-	if not session_token in app.sesion_keys: 
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-	if pk >= app.counter or pk < 1:
-		return JSONResponse(status_code=204)
-	else:
-		return app.list_patients[pk-1]
+@app.get("/patient/{pk}")
+def get(pk: int, session_token: str = Cookie(None)):
+	if session_token not in list(app.sessions.keys()):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
+	if(pk >= app.counter or pk < 1):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+
+	return app.list_patients[pk - 1]
 
 @app.delete("/patient/{pk}")
-def patient_personal_data(pk: int,session_token: str = Cookie(None)):
-	if not session_token in app.sesion_keys: 
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-	if pk >= app.counter-1 or pk < 1:
-		return JSONResponse(status_code=204)
-	else:
-		app.counter=app.counter-1
-		app.list_patients.remove(app.list_patients[pk-1])
+def del_patient(response: Response, pk: int, session_token: str = Cookie(None)):
+	if session_token not in list(app.sessions.keys()):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
+	if(pk >= app.counter or pk < 1):
+		return HTTPException(status_code=204, detail="Error - wrong value")
+	app.counter -= 1
+	app.list_patients.pop(pk)
