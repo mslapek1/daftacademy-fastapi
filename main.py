@@ -85,9 +85,8 @@ def login(cred: HTTPBasicCredentials = Depends(security)):
 
     session_token = sha256(bytes(f"{cred.username}{cred.password}{app.secret_key}", "utf8")).hexdigest()
     
-	response.status_code = 302
-	RedirectResponse(url='/welcome')   
-	response.set_cookie(key="session_token", value=session_token)
+    response: RedirectResponse = RedirectResponse("/welcome", 302)
+    response.set_cookie(key="session_token", value=session_token)
 
     return response
 
