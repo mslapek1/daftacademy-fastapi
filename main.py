@@ -118,7 +118,7 @@ def ex3(response: Response, session_token: str = Cookie(None)):
  app.list = list()
 
  @app.post('/patient')
- def add(response: Response, patient: Patient, session_token: str = Cookie(None)):
+ def add(response: Response, patient: Name, session_token: str = Cookie(None)):
  	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 	app.list.append(patient)
@@ -128,7 +128,7 @@ def ex3(response: Response, session_token: str = Cookie(None)):
 	return response
 
 @app.get('/patient')
-def all(patient: Patient, session_token: str = Cookie(None)):
+def all(session_token: str = Cookie(None)):
 	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 
