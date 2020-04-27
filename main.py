@@ -63,7 +63,7 @@ def hi(request: Request, session_token: str = Cookie(None)):
 	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 
-	return html.TemplateResponse("hi.html", {"request": request, "user": "trudnY"})
+	return templates.TemplateResponse("hi.html", {"request": request, "user": "trudnY"})
 
 # Wykład 3 - zadanie 2
 
