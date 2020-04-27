@@ -87,9 +87,8 @@ def login(cred: HTTPBasicCredentials = Depends(security)):
 
 	response.set_cookie(key="session_token", value=session_token)
     
-	response.status_code = status.HTTP_301_MOVED_PERMANENTLY
-	response.headers['Location'] = "/welcome"
-
+    response = RedirectResponse(url='/welcome')
+    response.status_code = status.HTTP_302_FOUND
 
     return response
 
