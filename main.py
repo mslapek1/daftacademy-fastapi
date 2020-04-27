@@ -126,34 +126,3 @@ def ex3(response: Response, session_token: str = Cookie(None)):
 
 	return response
 
-@app.get("/patient")
-def all(session_token: str = Cookie(None)):
-	if session_token not in app.sessions:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(len(app.list) == 0):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-
-	return app.list
-
-@app.get("/patient/{pt}")
-def get(pt: int, session_token: str = Cookie(None)):
-	if session_token not in app.sessions:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(pt > len(app.list) - 1 or pt < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-
-	return app.list[pt]
-
-@app.delete("/patient/{pt}")
-def del_patient(response: Response, pt: int, session_token: str = Cookie(None)):
-	if session_token not in app.sessions:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
-	if(pt > len(app.list) or pt < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-
-	app.list.pop(pt)
-	response.status_code = 204
-	response.headers["Location"] = "/patient/{pk}"
-
-	return response
-
