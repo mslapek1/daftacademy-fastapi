@@ -117,7 +117,7 @@ def ex3(response: Response, session_token: str = Cookie(None)):
 
  app.lists = list()
 
- @app.post("/patient")
+ @app.post("/patient", response_model=Name)
  def add(response: Response, pt: Name, session_token: str = Cookie(None)):
  	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
