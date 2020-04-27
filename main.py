@@ -129,28 +129,30 @@ def patient_position(response: Response, pt: Name, session_token: str = Cookie(N
 	return response
 
 @app.get("/patient")
-def all(session_token: str = Cookie(None)):
-	if session_token not in list(app.sessions.keys()):
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(app.counter == 0):
-		return HTTPException(status_code=204, detail="Error - wrong value")
+def patient_position(session_token: str = Cookie(None)):
+	if not session_token in app.sesion_keys: 
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+	patient_list = {}
+	for i in range(app.counter):
+		patient_list[f"{i}"]=app.list_of_patient[i-1]
+	return patient_list
 
-	return app.list_patients
 
-@app.get("/patient/{pt}")
-def get(pt: int, session_token: str = Cookie(None)):
-	if session_token not in list(app.sessions.keys()):
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(pt >= app.counter or pt < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
+@app.get("/patient/{pk}",response_model=Patient)
+def patient_personal_data(pk: int,session_token: str = Cookie(None)):
+	if not session_token in app.sesion_keys: 
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+	if pk >= app.counter or pk < 1:
+		return JSONResponse(status_code=204)
+	else:
+		return app.list_patients[pk-1]
 
-	return app.list_patients[pt - 1]
-
-@app.delete("/patient/{pt}")
-def del_patient(response: Response, pt: int, session_token: str = Cookie(None)):
-	if session_token not in list(app.sessions.keys()):
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
-	if(pt >= app.counter or pt < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-	app.counter -= 1
-	app.list_patients.pop(pt)
+@app.delete("/patient/{pk}")
+def patient_personal_data(pk: int,session_token: str = Cookie(None)):
+	if not session_token in app.sesion_keys: 
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+	if pk >= app.counter-1 or pk < 1:
+		return JSONResponse(status_code=204)
+	else:
+		app.counter=app.counter-1
+		app.list_patients.remove(app.list_patients[pk-1])
