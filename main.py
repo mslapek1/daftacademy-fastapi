@@ -123,8 +123,7 @@ def patient_position(response: Response, pt: Name, session_token: str = Cookie(N
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 	id = len(app.list_patients)
 	app.list_patients.append(pt)
-	response = RedirectResponse(url=f"/patient/{id}", status_code=302)
-	response.set_cookie(key="session_token", value=session_token)
+	response = RedirectResponse(f"/patient/{id}", status_code=status.HTTP_302_FOUND)
 	return response
 
 @app.get("/patient")
@@ -140,7 +139,7 @@ def get(pk: int, session_token: str = Cookie(None)):
 	if session_token not in list(app.sessions.keys()):
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 	if pk not in app.list_patients:
-		raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+		raise HTTPException(status_code=204, detail="not valid id")
 
 	return app.list_patients[pk]
 
