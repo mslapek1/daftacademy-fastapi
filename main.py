@@ -116,44 +116,16 @@ def ex3(response: Response, session_token: str = Cookie(None)):
  # Wykład 3 - zadanie 5
 
 app.lists = []
-
+app.counter = 0 
 @app.post("/patient", response_model=Name)
 def add(response: Response, pt: Name, session_token: str = Cookie(None)):
  	if session_token not in app.sessions:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 	app.lists.append(pt)
-	response = RedirectResponse(url=f"/patient/{len(app.lists) - 1}", status_code=302)
+	response = RedirectResponse(url=f"/patient/{app.counter}", status_code=302)
 	response.set_cookie(key="session_token", value=session_token)
 
-	return response
-
-@app.get("/patient")
-def all(session_token: str = Cookie(None)):
-	if session_token not in app.sessions:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(len(app.list) == 0):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-
-	return app.list
-
-@app.get("/patient/{pt}")
-def get(pt: int, session_token: str = Cookie(None)):
-	if session_token not in app.sessions:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if(pt > len(app.list) - 1 or pt < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-
-	return app.list[pt]
-
-@app.delete("/patient/{pt}")
-def del_patient(response: Response, pt: int, session_token: str = Cookie(None)):
-	if session_token not in app.sessions:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
-	if(pt > len(app.list) or pt < 1):
-		return HTTPException(status_code=204, detail="Error - wrong value")
-
-	app.list.pop(pt)
-	response.status_code = 204
-	response.headers["Location"] = "/patient/{pk}"
+	app.counter += 1
 
 	return response
+
