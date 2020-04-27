@@ -119,7 +119,7 @@ app.list_patients = []
 
 @app.post("/patient")
 def patient_position(response: Response, pt: Name, session_token: str = Cookie(None)):
-	if not session_token in list(app.sessions.keys()): 
+	if not session_token is None: 
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 	id = len(app.list_patients)
 	app.list_patients.append(pt)
@@ -128,28 +128,28 @@ def patient_position(response: Response, pt: Name, session_token: str = Cookie(N
 
 @app.get("/patient")
 def all(session_token: str = Cookie(None)):
-	if session_token not in list(app.sessions.keys()):
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
-	if not app.list_patients:
-		raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
-	return app.list_patients
+	if session_token is None:
+		response.status_code = status.HTTP_401_UNAUTHORIZED
+		return MESSAGE_UNAUTHORIZED
+	if len(app.patients) != 0:
+		return app.patients
+
+	response.status_code = status.HTTP_204_NO_CONTENT
 
 @app.get("/patient/{pk}")
 def get(pk: int, session_token: str = Cookie(None)):
-	if session_token not in list(app.sessions.keys()):
+	if session_token is None:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)
 	if pk not in app.list_patients:
-		raise HTTPException(status_code=204, detail="not valid id")
+		response.status_code = status.HTTP_204_NO_CONTENT
 
 	return app.list_patients[pk]
 
 @app.delete("/patient/{pk}")
 def del_patient(response: Response, pk: int, session_token: str = Cookie(None)):
-	if session_token not in list(app.sessions.keys()):
+	if session_token is None:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Error", headers={"WWW-Authenticate": "Basic"},)	
 	if pk in app.list_patients:
 		app.list_patients.pop(pk)
 	
 	response.status_code = status.HTTP_204_NO_CONTENT
-	response.headers["Location"] = f"/patient/{pk}"
-	return response
