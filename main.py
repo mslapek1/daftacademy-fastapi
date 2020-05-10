@@ -162,24 +162,22 @@ from fastapi import APIRouter, HTTPException, status, Response
 from pydantic import BaseModel
 from typing import Optional
 
-router = APIRouter()
 
-@router.on_event("startup")
+@app.on_event("startup")
 async def startup():
-    router.db_connection = sqlite3.connect('chinook.db')
-    router.db_connection.row_factory = sqlite3.Row
+	app.db_connection = sqlite3.connect('chinook.db')
+	app.db_connection.row_factory = sqlite3.Row
 
-@router.on_event("shutdown")
+@app.on_event("shutdown")
 async def shutdown():
-    router.db_connection.close()
+	app.db_connection.close()
 
 
-@router.get("/tracks")
+@app.get("/tracks")
 async def tracks(page: int = 0, per_page: int = 10):
 	offset = page * per_page
-	cursor = router.db_connection.cursor()
 
-	out  = cursor.execute(
+	out  = app.db_connection.execute(
     	"""SELECT * 
            FROM tracks 
            ORDER BY TrackId 
