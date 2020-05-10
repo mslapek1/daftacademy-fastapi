@@ -236,12 +236,12 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 
 	cursor.cursor().execute(
     	"""INSERT INTO albums (Title, ArtistsId)
-           VALUES (?, ?)""", (infoAlbum.title, albinfoAlbum.artist_id)
+           VALUES (?, ?)""", (infoAlbum.title, infoAlbum.artist_id)
     )
 
 	app.db_connection.commit()
 
-	response.status_code = status.HTTP_201_CREATED
+	response.status_code = 201
 
 	return InfoAlbumResponse(AlbumId=cursor.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
 
