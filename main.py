@@ -244,3 +244,17 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 	response.status_code = status.HTTP_201_CREATED
 
 	return InfoAlbumResponse(AlbumId=cursor.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
+
+@app.get("/albums/{album_id")
+async def get_albums(album_id: int):
+	app.db_connection.row_factory = sqlite3.Row
+
+	out = app.db_connection.execute(
+		"""
+		SELECT *
+		FROM albums
+		WHERE AlbumId = ?
+		""", (album_id, )
+		).fetchone()
+
+	return out 
