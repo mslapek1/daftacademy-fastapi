@@ -220,9 +220,7 @@ class InfoAlbumResponse(BaseModel):
 
 @app.post("/albums", response_model=InfoAlbumResponse)
 async def albums(infoAlbum: InfoAlbum, response: Response):
-	cursor = app.db_connection.cursor()
-
-	exists = cursor.execute(
+	is_artists = app.db_connection.execute(
 		"""
 		SELECT *
 		FROM artists
@@ -230,12 +228,12 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 		""", (infoAlbum.artist_id, )
 	).fetchall()
 
-	if not exists:
+	if not is_artists:
 			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
     							detail={"error": "No artists"})
 
-	cursor.cursor().execute(
-    	"""INSERT INTO albums (Title, ArtistsId)
+	app.db_connection.cursor().execute(
+    	"""INSERT INTO albums (Title, ArtistId)
            VALUES (?, ?)""", (infoAlbum.title, infoAlbum.artist_id)
     )
 
@@ -243,7 +241,7 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 
 	response.status_code = 201
 
-	return InfoAlbumResponse(AlbumId=cursor.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
+	return InfoAlbumResponse(AlbumId=app.db_connection.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
 
 @app.get("/albums/{album_id")
 async def get_albums(album_id: int):
