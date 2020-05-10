@@ -153,3 +153,38 @@ def del_patient(response: Response, pk: int, session_token: str = Cookie(None)):
 		app.list_patients.pop(pk)
 	
 	response.status_code = status.HTTP_204_NO_CONTENT
+
+# Wykład 4 - zadanie 1
+
+
+import sqlite3
+
+from fastapi import APIRouter, HTTPException, status, Response
+from pydantic import BaseModel
+from typing import Optional
+
+router = APIRouter()
+
+@app.on_event("startup")
+async def startup():
+    app.db_connection = sqlite3.connect('chinook.db')
+
+@app.on_event("shutdown")
+async def shutdown():
+    app.db_connection.close()
+
+
+@app.get("/tracks")
+async def tracks(page: int = 0, per_page: int = 10):
+	offset = page * per_page
+	cursor = router.db_connection.cursor()
+
+	out  = cursor.execute(
+    	"""SELECT * 
+           FROM tracks 
+           ORDER BY TrackId 
+           LIMIT ? 
+           OFFSET ?""", (per_page, offset)
+    ).fetchall()
+
+	return out
