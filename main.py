@@ -190,15 +190,15 @@ async def tracks(page: int = 0, per_page: int = 10):
 
 # Wykład 4 - zadanie 2
 
-@app.get("/tracks/composers/")
+@app.get("/tracks/composers")
 async def tracks(composer_name: str):
 	app.db_connection.row_factory = lambda cursor, row: row[0]
 
 	out  = app.db_connection.execute(
     	"""SELECT Name
            FROM tracks 
-           ORDER BY Name
-           WHERE Composer = ?""", (composer_name, )
+           WHERE Composer = ?
+           ORDER BY Name""", (composer_name, )
     ).fetchall()
 
 	if not out:
