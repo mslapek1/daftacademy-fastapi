@@ -158,23 +158,23 @@ def del_patient(response: Response, pk: int, session_token: str = Cookie(None)):
 
 
 import sqlite3
-
 from fastapi import APIRouter, HTTPException, status, Response
 from pydantic import BaseModel
 from typing import Optional
 
 router = APIRouter()
 
-@app.on_event("startup")
+@router.on_event("startup")
 async def startup():
-    app.db_connection = sqlite3.connect('chinook.db')
+    router.db_connection = sqlite3.connect('chinook.db')
+    router.db_connection.row_factory = sqlite3.Row
 
-@app.on_event("shutdown")
+@router.on_event("shutdown")
 async def shutdown():
-    app.db_connection.close()
+    router.db_connection.close()
 
 
-@app.get("/tracks")
+@router.get("/tracks")
 async def tracks(page: int = 0, per_page: int = 10):
 	offset = page * per_page
 	cursor = router.db_connection.cursor()
