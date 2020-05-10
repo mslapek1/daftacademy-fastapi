@@ -191,7 +191,7 @@ async def tracks(page: int = 0, per_page: int = 10):
 # Wykład 4 - zadanie 2
 
 @app.get("/tracks/composers")
-async def tracks(composer_name: str):
+async def composers(composer_name: str):
 	app.db_connection.row_factory = lambda cursor, row: row[0]
 
 	out  = app.db_connection.execute(
@@ -203,6 +203,44 @@ async def tracks(composer_name: str):
 
 	if not out:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    						detail={"error": "No compser"})
+							detail={"error": "No compser"})
 
 	return out
+
+# Wykład 4 - zadanie 3
+
+class InfoAlbum(BaseModel):
+	title: str
+	artist_id: int
+
+class InfoAlbumResponse(BaseModel):
+	AlbumId: int
+	Title: str
+	ArtistId: int
+
+@app.post("/albums")
+async def albums(infoAlbum: InfoAlbum, response: Response):
+
+	exists = app.db_connection.execute(
+		"""
+		SELECT *
+		FROM artists
+		WHERE ArtistId = ?
+		""", (infoAlbum.artist_id, )
+	).fetchall()
+
+	if not exists:
+			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    							detail={"error": "No artists"})
+
+	out  = app.db_connection.execute(
+    	"""INSERT INTO albums (Title, ArtistsId)
+           VALUES (?, ?)""", (infoAlbum.title, albinfoAlbum.artist_id)
+    ).fetchall()
+
+	app.db_connection.commit()
+	cursor.row_factory = sqlite3.Row
+
+	response.status_code = status.HTTP_201_CREATED
+
+	return InfoAlbumResponse(AlbumId=cursor.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
