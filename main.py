@@ -242,7 +242,7 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 
 	return InfoAlbumResponse(AlbumId=cursor.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
 
-@app.get("/albums/{album_id")
+@app.get("/albums/{album_id}")
 async def get_albums(album_id: int):
 	app.db_connection.row_factory = sqlite3.Row
 
