@@ -166,7 +166,6 @@ from typing import Optional
 @app.on_event("startup")
 async def startup():
 	app.db_connection = sqlite3.connect('chinook.db')
-	app.db_connection.row_factory = sqlite3.Row
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -176,6 +175,8 @@ async def shutdown():
 @app.get("/tracks")
 async def tracks(page: int = 0, per_page: int = 10):
 	offset = page * per_page
+	app.db_connection.row_factory = sqlite3.Row
+
 
 	out  = app.db_connection.execute(
     	"""SELECT * 
@@ -191,6 +192,7 @@ async def tracks(page: int = 0, per_page: int = 10):
 
 @app.get("/tracks/composers/")
 async def tracks(composer_name: str):
+	app.db_connection.row_factory = lambda cursor, row: row[0]
 
 	out  = app.db_connection.execute(
     	"""SELECT Name
