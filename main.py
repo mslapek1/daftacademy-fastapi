@@ -186,3 +186,21 @@ async def tracks(page: int = 0, per_page: int = 10):
     ).fetchall()
 
 	return out
+
+# Wykład 4 - zadanie 2
+
+@app.get("/tracks/composers/")
+async def tracks(composer_name: str):
+
+	out  = app.db_connection.execute(
+    	"""SELECT Name
+           FROM tracks 
+           ORDER BY Name
+           WHERE Composer = ?""", (composer_name, )
+    ).fetchall()
+
+	if not out:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    						detail={"error": "No compser"})
+
+	return out
