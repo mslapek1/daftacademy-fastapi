@@ -229,19 +229,18 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 	).fetchall()
 
 	if not is_artists:
-			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    							detail={"error": "No artists"})
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    						detail={"error": "No artists"})
 
-	app.db_connection.cursor().execute(
+	cursor = app.db_connection.cursor().execute(
     	"""INSERT INTO albums (Title, ArtistId)
            VALUES (?, ?)""", (infoAlbum.title, infoAlbum.artist_id)
     )
 
 	app.db_connection.commit()
+	response.status_code = status.HTTP_201_CREATED
 
-	response.status_code = 201
-
-	return InfoAlbumResponse(AlbumId=app.db_connection.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
+	return InfoAlbumResponse(AlbumId=cursor.lastrowid, Title=infoAlbum.title, ArtistId=infoAlbum.artist_id)
 
 @app.get("/albums/{album_id")
 async def get_albums(album_id: int):
@@ -255,4 +254,8 @@ async def get_albums(album_id: int):
 		""", (album_id, )
 		).fetchone()
 
-	return out 
+	if not out:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    						detail={"error": "No artists"})
+
+	return out
