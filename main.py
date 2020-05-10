@@ -221,7 +221,7 @@ class InfoAlbumResponse(BaseModel):
 @app.post("/albums")
 async def albums(infoAlbum: InfoAlbum, response: Response):
 
-	exists = app.db_connection.execute(
+	exists = app.db_connection.cursor().execute(
 		"""
 		SELECT *
 		FROM artists
@@ -233,13 +233,12 @@ async def albums(infoAlbum: InfoAlbum, response: Response):
 			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
     							detail={"error": "No artists"})
 
-	out  = app.db_connection.execute(
+	app.db_connection.cursor().execute(
     	"""INSERT INTO albums (Title, ArtistsId)
            VALUES (?, ?)""", (infoAlbum.title, albinfoAlbum.artist_id)
     ).fetchall()
 
 	app.db_connection.commit()
-	cursor.row_factory = sqlite3.Row
 
 	response.status_code = status.HTTP_201_CREATED
 
