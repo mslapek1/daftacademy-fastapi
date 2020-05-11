@@ -289,15 +289,15 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 	
 	data: CustomerInfo = customerInfo.dict()
 
-	app.db_connection.execute("""
+	cursor = app.db_connection.execute("""
         UPDATE customers SET
-        company = IFNULL(company, ?),
-        address = IFNULL(address, ?),
-        city = IFNULL(city, ?),
-        state = IFNULL(state, ?),
-        country = IFNULL(country, ?),
-        postalcode = IFNULL(postalcode, ?),
-        fax = IFNULL(fax, ?)
+        company = IFNULL(?, company),
+        address = IFNULL(?, address),
+        city = IFNULL(?, city),
+        state = IFNULL(?, state),
+        country = IFNULL(?, country),
+        postalcode = IFNULL(?, postalcode),
+        fax = IFNULL(?, fax)
         WHERE CustomerId = ?
         """,
         (
@@ -314,7 +314,7 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 	
 	app.db_connection.commit()
 	
-	out = app.db_connection.execute("""
+	out = cursor.execute("""
 		SELECT * 
 		FROM customers 
 		WHERE CustomerId = ?""",(customer_id, )
