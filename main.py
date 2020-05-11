@@ -327,18 +327,23 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 
 # Wykład 4 - zadanie 5
 
+def customers():
+	app.db_connection.row_factory = sqlite3.Row
+
+	out = app.db_connection.execute("""
+		SELECT customers.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS Sum
+		FROM customers
+		JOIN invoices  ON customers.CustomerId = invoices.CustomerId
+		GROUP BY customers.CustomerId
+		ORDER BY Sum DESC, customers.CustomerId
+	""").fetchall()
+
+	return out
+
 @app.get("/sales")
 async def get_albums(category: str):
 	if category == "customers":
-		app.db_connection.row_factory = sqlite3.Row
-
-		out = app.db_connection.execute("""
-			SELECT customers.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS SumTotal
-			FROM customers
-			JOIN invoices  ON customers.CustomerId = invoices.CustomerId
-			GROUP BY customers.CustomerId
-			ORDER BY SumTotal DESC, customers.CustomerId
-		""").fetchall()
+		out = customers()
 
 	else:        
 		raise HTTPException(
@@ -348,3 +353,14 @@ async def get_albums(category: str):
 
 	return out
 
+
+# Wykład 4 - zadanie 6
+
+def genres():
+	app.db_connection.row_factory = sqlite3.Row
+
+	out = app.db_connection.execute("""
+
+	""")
+
+	return out
