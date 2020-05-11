@@ -287,8 +287,10 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
     						detail={"error": "No customer"})
 	
-	data = customerInfo.dict(exclude_unset=True)
-	data = list(data.values())
+	customerInfoDict = customerInfo.dict(exclude_unset=True)
+	data = {i.lower(): is_customer[i] for i in dict(is_customer)}
+
+	data.update(customerInfoDict)
 
 	app.db_connection.execute("""
         UPDATE customers SET
