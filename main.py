@@ -333,7 +333,7 @@ def customers():
 	out = app.db_connection.execute("""
 		SELECT customers.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS SumTotal
 		FROM customers
-		JOIN invoices  on customers.CustomerId = invoices.CustomerId
+		JOIN invoices  ON customers.CustomerId = invoices.CustomerId
 		GROUP BY customers.CustomerId
 		ORDER BY SumTotal DESC, customers.CustomerId
 	""").fetchall()
