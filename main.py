@@ -259,3 +259,65 @@ async def get_albums(album_id: int):
     						detail={"error": "No artists"})
 
 	return out
+
+# Wykład 4 - zadanie 4
+
+
+class CustomerInfo(BaseModel):
+    company: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    postalcode: Optional[str] = None
+    fax: Optional[str] = None
+
+@app.put("/customers/{customer_id}")
+async def put_customer(customer_id: int, customerInfo: CustomerInfo):
+	cursor.row_factory = sqlite3.Row
+
+	is_customer = app.db_connection.execute("""
+		SELECT *
+		FROM customers
+		WHERE CustomerId = ?
+
+	""", (customer_id)).fetchone()
+
+	if not is_customer:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    						detail={"error": "No customer"})
+	
+	data: CustomerInfo = customerInfo.dict()
+
+	app.db_connection.execute("""
+        UPDATE customers SET
+        company = IFNULL(company, ?),
+        address = IFNULL(address, ?),
+        city = IFNULL(city, ?),
+        state = IFNULL(state, ?),
+        country = IFNULL(country, ?),
+        postalcode = IFNULL(postalcode, ?),
+        fax = IFNULL(fax, ?)
+        WHERE CustomerId = ?
+        """,
+        (
+            data["company"],
+            data["address"],
+            data["city"],
+            data["state"],
+            data["country"],
+            data["postalcode"],
+            data["fax"],
+            customer_id,
+        ),
+	)
+	
+	app.db_connection.commit()
+	
+	out = app.db_connection.execute("""
+		SELECT * 
+		FROM customers 
+		WHERE CustomerId = ?""",(customer_id, )
+	).fetchone()
+
+	return out
