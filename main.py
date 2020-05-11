@@ -281,7 +281,7 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 		FROM customers
 		WHERE CustomerId = ?
 
-	""", (customer_id)).fetchone()
+	""", (customer_id, )).fetchone()
 
 	if not is_customer:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
