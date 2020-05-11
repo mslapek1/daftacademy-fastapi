@@ -340,27 +340,35 @@ def customers():
 
 	return out
 
-@app.get("/sales")
-async def get_albums(category: str):
-	if category == "customers":
-		out = customers()
-
-	else:        
-		raise HTTPException(
-			status_code=status.HTTP_404_NOT_FOUND,
-			detail={"error": "Error: no statistics"},
-		)
-
-	return out
-
-
 # Wykład 4 - zadanie 6
 
 def genres():
 	app.db_connection.row_factory = sqlite3.Row
 
 	out = app.db_connection.execute("""
+		SELECT genres.Name, COUNT(*) as Sum
+		FROM genres
+		JOIN tracks ON genres.GenreId = tracks.GenreId
+		JOIN invoice_items ON invoice_items.GenreId = genres.GenreId
+		GROUP BY genres.GenreId
+		ORDER BY Sum DESC, genres.Name
+	""").fetchall()
 
-	""")
+	return out
+
+
+
+@app.get("/sales")
+async def get_albums(category: str):
+	if category == "customers":
+		out = customers()
+	if category == "genres":
+		out = genres()
+
+	else:        
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail={"error": "Error: no statistics"},
+		)
 
 	return out
