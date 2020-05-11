@@ -346,10 +346,10 @@ def genres():
 	app.db_connection.row_factory = sqlite3.Row
 
 	out = app.db_connection.execute("""
-		SELECT genres.Name, COUNT(*) as Sum
+		SELECT genres.Name, sum(Quantity) AS Sum
 		FROM genres
 		JOIN tracks ON genres.GenreId = tracks.GenreId
-		JOIN invoice_items ON invoice_items.GenreId = genres.GenreId
+		JOIN invoice_items ON invoice_items.TrackId  = tracks.TrackId
 		GROUP BY genres.GenreId
 		ORDER BY Sum DESC, genres.Name
 	""").fetchall()
