@@ -324,3 +324,31 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 	).fetchone()
 
 	return out
+
+# Wykład 4 - zadanie 5
+
+def customers():
+	app.db_connection.row_factory = sqlite3.Row
+
+	out = app.db_connection.execute("""
+		SELECT customers.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS sum
+		FROM invoices
+		JOIN customer on invoices.CustomerId
+		GROUP BY invoices.CustomerId
+		ORDER BY sum DESC, invoices.CustomerId ASC
+	""").fetchall()
+
+	return out
+
+@app.get("/sales")
+async def get_albums(category: str):
+	if category == "customers":
+		return customers()
+
+	else:        
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail={"error": "Error: no statistics"},
+		)
+
+
