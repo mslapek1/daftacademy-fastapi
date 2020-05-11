@@ -287,17 +287,18 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
     						detail={"error": "No customer"})
 	
-	data: CustomerInfo = customerInfo.dict()
+	data = customerInfo.dict(exclude_unset=True)
+	data = list(data.values())
 
-	cursor = app.db_connection.execute("""
+	app.db_connection.execute("""
         UPDATE customers SET
-        company = IFNULL(?, company),
-        address = IFNULL(?, address),
-        city = IFNULL(?, city),
-        state = IFNULL(?, state),
-        country = IFNULL(?, country),
-        postalcode = IFNULL(?, postalcode),
-        fax = IFNULL(?, fax)
+        company = ?,
+        address = ?,
+        city = ?,
+        state = ?,
+        country = ?,
+        postalcode = ?,
+        fax = ?
         WHERE CustomerId = ?
         """,
         (
@@ -314,7 +315,7 @@ async def put_customer(customer_id: int, customerInfo: CustomerInfo):
 	
 	app.db_connection.commit()
 	
-	out = cursor.execute("""
+	out = app.db_connection.execute("""
 		SELECT * 
 		FROM customers 
 		WHERE CustomerId = ?""",(customer_id, )
