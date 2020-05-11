@@ -331,11 +331,11 @@ def customers():
 	app.db_connection.row_factory = sqlite3.Row
 
 	out = app.db_connection.execute("""
-		SELECT customers.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS sum
-		FROM invoices
-		JOIN customer on invoices.CustomerId
-		GROUP BY invoices.CustomerId
-		ORDER BY sum DESC, invoices.CustomerId ASC
+		SELECT customers.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS SumTotal
+		FROM customers
+		JOIN invoices  on customers.CustomerId = invoices.CustomerId
+		GROUP BY customers.CustomerId
+		ORDER BY SumTotal DESC, customers.CustomerId
 	""").fetchall()
 
 	return out
@@ -352,3 +352,13 @@ async def get_albums(category: str):
 		)
 
 
+# Wykład 4 - zadanie 6
+
+def genres():
+	app.db_connection.row_factory = sqlite3.Row
+
+	out = app.db_connection.execute("""
+
+	""")
+
+	return out
