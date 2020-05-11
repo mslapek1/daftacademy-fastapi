@@ -274,7 +274,7 @@ class CustomerInfo(BaseModel):
 
 @app.put("/customers/{customer_id}")
 async def put_customer(customer_id: int, customerInfo: CustomerInfo):
-	cursor.row_factory = sqlite3.Row
+	app.db_connection.row_factory = sqlite3.Row
 
 	is_customer = app.db_connection.execute("""
 		SELECT *
